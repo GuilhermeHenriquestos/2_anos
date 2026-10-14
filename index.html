@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Te amo mil milhões</title>
+    <!-- Fontes do Google: Press Start 2P para Pixel Art e VT323 para números -->
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=VT323&display=swap" rel="stylesheet">
+    <style>
+        /* Variáveis do Retângulo 3D (Formato de Foto Vertical) */
+        :root {
+            --cube-width: 260px;
+            --cube-height: 380px;
+            --half-width: 130px; /* Metade da largura para o eixo Z */
+        }
+
+        @media (max-width: 768px) {
+            :root {
+                --cube-width: 200px;
+                --cube-height: 300px;
+                --half-width: 100px;
+            }
+        }
+
+        /* Estilos Globais e Fundo Dinâmico */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(-45deg, #ff9a9e, #fecfef, #a1c4fd, #ffdde1);
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            font-family: sans-serif;
+            position: relative;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Container centralizado */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            width: 100%;
+            height: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Thanos Rebolando */
+        .thanos-gif {
+            width: clamp(80px, 15vw, 120px);
+            margin-bottom: 5px;
+            z-index: 15;
+            filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.3)); /* Mantendo o estilo pixel art na sombra */
+        }
+
+        /* Explosão de Corações (Load) */
+        #explosion-container {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        .exploding-heart {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            font-size: 24px;
+            transform: translate(-50%, -50%) scale(0);
+            animation: explode 2s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+        }
+
+        @keyframes explode {
+            0% { transform: translate(-50%, -50%) scale(0); opacity: 1; }
+            80% { opacity: 1; }
+            100% { 
+                transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1.5) rotate(var(--rot)); 
+                opacity: 0; 
+            }
+        }
+
+        /* Partículas flutuantes contínuas */
+        .particle {
+            position: absolute;
+            bottom: -10vh;
+            pointer-events: none;
+            z-index: 1;
+            animation: floatUp linear infinite;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(0.8) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(-110vh) scale(1.5) rotate(360deg); opacity: 0; }
+        }
+
+        /* Título - Estilo Pixel Art */
+        h1 {
+            font-family: 'Press Start 2P', cursive;
+            color: #ff3333;
+            font-size: clamp(0.8rem, 2.8vw, 1.8rem);
+            text-shadow: 3px 3px 0px #000, -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff; 
+            margin: 0 0 15px 0;
+            text-align: center;
+            padding: 0 15px;
+            line-height: 1.4;
+        }
+
+        /* Retângulo 3D (Antigo Cubo) */
+        .scene {
+            width: var(--cube-width);
+            height: var(--cube-height);
+            perspective: 1200px;
+            margin: 0 auto 15px auto;
+        }
+
+        .cube {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transform-style: preserve-3d;
+            transform: translateZ(calc(-1 * var(--half-width)));
+            transition: transform 1.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+        }
+
+        .cube__face {
+            position: absolute;
+            width: var(--cube-width);
+            height: var(--cube-height);
+            border: 4px solid #fff;
+            background-color: #ffb8b8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            font-family: 'Press Start 2P', cursive;
+            font-size: 1rem;
+            text-shadow: 2px 2px 0px #000;
+        }
+
+        .cube__face img { width: 100%; height: 100%; object-fit: cover; }
+
+        .cube__face--front  { transform: rotateY(  0deg) translateZ(var(--half-width)); }
+        .cube__face--right  { transform: rotateY( 90deg) translateZ(var(--half-width)); }
+        .cube__face--back   { transform: rotateY(180deg) translateZ(var(--half-width)); }
+        .cube__face--left   { transform: rotateY(-90deg) translateZ(var(--half-width)); }
+
+        /* Contador - Estilo Placar Arcade/Pixel Art */
+        .countdown-wrapper {
+            width: 95%;
+            max-width: 600px;
+        }
+
+        .countdown {
+            background: #000;
+            padding: 15px 10px;
+            border: 4px solid #fff;
+            box-shadow: 6px 6px 0px rgba(0,0,0,0.8);
+            display: flex;
+            flex-wrap: nowrap;
+            justify-content: space-between;
+            align-items: stretch;
+            gap: 8px;
+        }
+
+        .time-box {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            flex: 1;
+            min-width: 0;
+            background: #1a1a1a;
+            padding: 10px 5px;
+            border: 2px solid #444;
+        }
+
+        .time-box span {
+            font-family: 'VT323', monospace;
+            color: #ff3333;
+            font-size: clamp(2.2rem, 8vw, 4rem);
+            position: relative;
+            display: inline-block;
+            line-height: 1;
+        }
+
+        .time-label {
+            font-family: 'Press Start 2P', cursive;
+            font-size: clamp(0.35rem, 1.8vw, 0.6rem);
+            color: #f1c40f;
+            text-transform: uppercase;
+            margin-top: 10px;
+            text-align: center;
+        }
+
+        .drop-animation {
+            animation: dropNum 0.2s steps(4, end);
+        }
+
+        @keyframes dropNum {
+            0% { transform: translateY(-10px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+        }
+
+        /* === POKÉMONS === */
+        .poke-zone {
+            position: absolute;
+            z-index: 5;
+            width: clamp(55px, 12vw, 100px);
+            filter: drop-shadow(4px 4px 0px rgba(0,0,0,0.3));
+        }
+
+        .poke-large { width: clamp(80px, 18vw, 160px); }
+
+        .poke-left { left: 2%; }
+        .poke-right { right: 2%; }
+
+        .anim-idle-left { animation: idleLeft 2s steps(4, end) infinite alternate; }
+        .anim-idle-right { animation: idleRight 2s steps(4, end) infinite alternate; }
+
+        @keyframes idleLeft {
+            0% { transform: scaleX(-1) translateY(0); }
+            100% { transform: scaleX(-1) translateY(-10px); }
+        }
+        @keyframes idleRight {
+            0% { transform: scaleX(1) translateY(0); }
+            100% { transform: scaleX(1) translateY(-10px); }
+        }
+
+        /* POSICIONAMENTO DOS POKÉMONS */
+        .pos-1 { top: 5%; }
+        .pos-2 { top: 25%; }
+        .pos-3 { top: 45%; }
+        .pos-4 { top: 65%; }
+        .pos-5 { top: 85%; }
+
+        @media (max-width: 768px) {
+            .poke-zone { width: clamp(45px, 12vw, 75px); }
+            .poke-large { width: clamp(70px, 18vw, 110px); }
+            
+            .pos-1 { top: 3%; }
+            .pos-2 { top: 20%; }
+            .pos-3 { top: 40%; }
+            .pos-4 { top: 75%; }
+            .pos-5 { top: 88%; } 
+        }
+    </style>
+</head>
+<body>
+
+    <div id="particles-container"></div>
+    <div id="explosion-container"></div>
+
+    <!-- POKÉMONS - LADO ESQUERDO -->
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/25.gif" class="poke-zone poke-left pos-1 anim-idle-left" style="animation-delay: 0s;">
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/1.gif" class="poke-zone poke-left pos-2 anim-idle-left" style="animation-delay: -0.5s;">
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/133.gif" class="poke-zone poke-left pos-3 anim-idle-left" style="animation-delay: -1s;">
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/39.gif" class="poke-zone poke-left pos-4 anim-idle-left" style="animation-delay: -0.2s;">
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/197.gif" class="poke-zone poke-left pos-5 anim-idle-left" style="animation-delay: -1.5s;">
+
+    <!-- POKÉMONS - LADO DIREITO -->
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/384.gif" class="poke-zone poke-large poke-right pos-1 anim-idle-right" style="animation-delay: -0.5s;">
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/151.gif" class="poke-zone poke-right pos-2 anim-idle-right" style="animation-delay: -1s;">
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/4.gif" class="poke-zone poke-right pos-3 anim-idle-right" style="animation-delay: -0.8s;">
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/7.gif" class="poke-zone poke-right pos-4 anim-idle-right" style="animation-delay: -1.5s;">
+    <img src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/versions/generation-v/black-white/animated/196.gif" class="poke-zone poke-right pos-5 anim-idle-right" style="animation-delay: -0.2s;">
+
+    <!-- Conteúdo Centralizado -->
+    <div class="main-content">
+        
+        <!-- THANOS REBOLANDO -->
+        <img src="assests\thanos.gif" alt="Thanos Rebolando" class="thanos-gif">
+        
+        <h1>Te Amo Mil Milhões</h1>
+
+        <!-- Retângulo 3D -->
+        <div class="scene">
+            <div class="cube" id="cube">
+                <!-- Coloque suas fotos no src="" -->
+                <div class="cube__face cube__face--front">
+                    <img src="assests\01.jpeg" alt="Foto 1" onerror="this.style.display='none'; this.parentNode.innerHTML='Foto 1';">
+                </div>
+                <div class="cube__face cube__face--right">
+                    <img src="assests\02.jpeg" alt="Foto 2" onerror="this.style.display='none'; this.parentNode.innerHTML='Foto 2';">
+                </div>
+                <div class="cube__face cube__face--back">
+                    <img src="assests\03.jpeg" alt="Foto 3" onerror="this.style.display='none'; this.parentNode.innerHTML='Foto 3';">
+                </div>
+                <div class="cube__face cube__face--left">
+                    <img src="assests\04.jpeg" alt="Foto 4" onerror="this.style.display='none'; this.parentNode.innerHTML='Foto 4';">
+                </div>
+            </div>
+        </div>
+        
+        <!-- Frase reposicionada corretamente entre o cubo e o contador -->
+        <h1>Há 2 Anos e Contando</h1>
+
+        <!-- Contador Progressivo -->
+        <div class="countdown-wrapper">
+            <div class="countdown">
+                <div class="time-box">
+                    <span id="days">00</span>
+                    <div class="time-label">Dias</div>
+                </div>
+                <div class="time-box">
+                    <span id="hours">00</span>
+                    <div class="time-label">Horas</div>
+                </div>
+                <div class="time-box">
+                    <span id="minutes">00</span>
+                    <div class="time-label">Mins</div>
+                </div>
+                <div class="time-box">
+                    <span id="seconds">00</span>
+                    <div class="time-label">Segs</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // === Explosão de Corações Inicial ===
+        function explodeHearts() {
+            const container = document.getElementById('explosion-container');
+            const colors = ['❤️', '💖', '✨', '💕', '💘'];
+            
+            for (let i = 0; i < 40; i++) {
+                const heart = document.createElement('div');
+                heart.classList.add('exploding-heart');
+                heart.innerHTML = colors[Math.floor(Math.random() * colors.length)];
+                
+                const angle = Math.random() * Math.PI * 2;
+                const radius = 100 + Math.random() * (window.innerWidth / 1.5); 
+                
+                const tx = Math.cos(angle) * radius;
+                const ty = Math.sin(angle) * radius;
+                const rot = Math.random() * 360 + 'deg';
+
+                heart.style.setProperty('--tx', `${tx}px`);
+                heart.style.setProperty('--ty', `${ty}px`);
+                heart.style.setProperty('--rot', rot);
+                heart.style.fontSize = (Math.random() * 20 + 15) + 'px';
+
+                container.appendChild(heart);
+                
+                setTimeout(() => { heart.remove(); }, 2000);
+            }
+        }
+
+        window.addEventListener('load', explodeHearts);
+
+        // === Rotação Automática do Retângulo ===
+        const cube = document.getElementById('cube');
+        let currentAngle = 0;
+
+        setInterval(() => {
+            currentAngle -= 90;
+            cube.style.transform = `translateZ(calc(-1 * var(--half-width))) rotateY(${currentAngle}deg)`;
+        }, 5000);
+
+        // === Contador Progressivo (Desde 09/11/2024) ===
+        const startDate = new Date(2024, 10, 9, 0, 0, 0).getTime();
+
+        function animateValue(id, newValue) {
+            const element = document.getElementById(id);
+            if (element.innerText !== newValue) {
+                element.classList.remove('drop-animation');
+                void element.offsetWidth; // Força reinício
+                element.innerText = newValue;
+                element.classList.add('drop-animation');
+            }
+        }
+
+        setInterval(() => {
+            const now = new Date().getTime();
+            const timeTogether = now - startDate;
+
+            if (timeTogether < 0) return;
+
+            const days = Math.floor(timeTogether / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((timeTogether % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((timeTogether % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((timeTogether % (1000 * 60)) / 1000);
+
+            const formatNumber = (num) => num < 10 ? '0' + num : num.toString();
+
+            animateValue('days', formatNumber(days));
+            animateValue('hours', formatNumber(hours));
+            animateValue('minutes', formatNumber(minutes));
+            animateValue('seconds', formatNumber(seconds));
+        }, 1000);
+
+        // === Partículas de Fundo Dinâmico ===
+        function createParticle() {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            
+            particle.innerHTML = Math.random() > 0.5 ? '❤' : '✨';
+            particle.style.left = Math.random() * 100 + 'vw';
+            particle.style.color = Math.random() > 0.5 ? 'rgba(255, 255, 255, 0.5)' : 'rgba(255, 100, 150, 0.4)';
+            particle.style.fontSize = (Math.random() * 15 + 10) + 'px';
+            particle.style.animationDuration = (Math.random() * 8 + 6) + 's';
+            
+            document.getElementById('particles-container').appendChild(particle);
+            
+            setTimeout(() => { particle.remove(); }, 14000);
+        }
+
+        setInterval(createParticle, 600);
+    </script>
+</body>
+</html>
